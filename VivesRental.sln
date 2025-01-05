@@ -29,6 +29,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VivesRental.Model.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VivesRental.Model.Extensions", "VivesRental.Model.Extensions\VivesRental.Model.Extensions.csproj", "{A06703F2-CA97-44A2-84EA-20DD7D44893F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VivesRental.Api", "VivesRental.Api\VivesRental.Api.csproj", "{B060651D-2DC0-4844-8922-DCB9072DF0A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VivesRental.BlazorApp", "VivesRental.BlazorApp\VivesRental.BlazorApp.csproj", "{ACE0CEAE-D7B5-4D0E-91D0-927AB69986FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +79,14 @@ Global
 		{A06703F2-CA97-44A2-84EA-20DD7D44893F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A06703F2-CA97-44A2-84EA-20DD7D44893F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A06703F2-CA97-44A2-84EA-20DD7D44893F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B060651D-2DC0-4844-8922-DCB9072DF0A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B060651D-2DC0-4844-8922-DCB9072DF0A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B060651D-2DC0-4844-8922-DCB9072DF0A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B060651D-2DC0-4844-8922-DCB9072DF0A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACE0CEAE-D7B5-4D0E-91D0-927AB69986FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACE0CEAE-D7B5-4D0E-91D0-927AB69986FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACE0CEAE-D7B5-4D0E-91D0-927AB69986FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACE0CEAE-D7B5-4D0E-91D0-927AB69986FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
