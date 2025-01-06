@@ -1,4 +1,36 @@
 ﻿@page "/customers"
+// Geeft aan dat deze pagina bereikbaar is via de URL '/customers'.
+
+@inject CustomerService CustomerService
+// Injecteert de CustomerService, waarmee we API-aanroepen naar klanten kunnen doen.
 
 <h1>Klantenbeheer</h1>
-<p>Hier komt het klantenbeheer.</p>
+// Titel van de pagina.
+
+@if (customers == null)
+{
+    <p>Klanten worden geladen...</p>
+    // Toont een laadbericht zolang de klanten nog niet zijn geladen.
+}
+else
+{
+    <ul>
+        @foreach (var customer in customers)
+        {
+            <li>@customer.FirstName @customer.LastName</li>
+            // Itereert door de lijst van klanten en toont de voor- en achternaam in een <li>-element.
+        }
+    </ul>
+    // Lijst met klanten.
+}
+
+@code {
+    private List<CustomerResult>? customers;
+    // Eigenschap waarin de opgehaalde klanten worden opgeslagen. Het '?' betekent dat de waarde null kan zijn.
+
+    protected override async Task OnInitializedAsync()
+    {
+        customers = await CustomerService.GetAllAsync();
+        // Haalt de lijst van klanten asynchroon op via de CustomerService.
+    }
+}

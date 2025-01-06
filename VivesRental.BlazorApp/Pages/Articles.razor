@@ -1,5 +1,36 @@
-﻿<h3>Articles</h3>
+﻿@page "/articles"
+// Geeft aan dat deze pagina bereikbaar is via de URL '/articles'.
+
+@inject ArticleService ArticleService
+// Injecteert de ArticleService, waarmee we API-aanroepen naar artikelen kunnen doen.
+
+<h1>Artikelbeheer</h1>
+// Titel van de pagina
+
+@if (articles == null)
+{
+    <p>Artikelen worden geladen...</p>
+    // Toont een laadbericht zolang de artikelen nog niet zijn geladen.
+}
+else
+{
+    <ul>
+        @foreach (var article in articles)
+        {
+            <li>@article.Name</li>
+            // Itereert door de lijst van artikelen en toont de naam van elk artikel in een <li>-element.
+        }
+    </ul>
+    // Lijst met artikelen.
+}
 
 @code {
+    private List<ArticleResult>? articles;
+    // Eigenschap waarin de opgehaalde artikelen worden opgeslagen. Het '?' betekent dat de waarde null kan zijn.
 
+    protected override async Task OnInitializedAsync()
+    {
+        articles = await ArticleService.GetAllAsync();
+        // Haalt de lijst van artikelen asynchroon op via de ArticleService.
+    }
 }
