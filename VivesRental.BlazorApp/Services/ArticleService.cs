@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Json; // Nodig voor het gebruik van GetFromJsonAsync.
 using VivesRental.Services.Model.Results; // Importeert het model voor de resultaten.
-using VivesRental.Services.Model;
 
 namespace VivesRental.BlazorApp.Services
 {
