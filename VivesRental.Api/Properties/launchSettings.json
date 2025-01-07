@@ -1,23 +1,23 @@
 ﻿{
-  "$schema": "https://json.schemastore.org/launchsettings.json",
-  "profiles": {
-    "http": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": false,
-      "applicationUrl": "http://localhost:5000",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "https": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": false,
-      "applicationUrl": "https://localhost:7214;http://localhost:5000",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+    "$schema": "https://json.schemastore.org/launchsettings.json",
+    "profiles": {
+        "http": {
+            "commandName": "Project",
+            "dotnetRunMessages": true, // Displays server messages in the console.
+            "launchBrowser": false, // Disables automatic browser launch on start.
+            "applicationUrl": "http://localhost:5000", // Specifies the HTTP endpoint.
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development" // Sets the environment to Development.
+            }
+        },
+        "https": {
+            "commandName": "Project",
+            "dotnetRunMessages": true, // Displays server messages in the console.
+            "launchBrowser": false, // Disables automatic browser launch on start.
+            "applicationUrl": "https://localhost:7214;http://localhost:5000", // Specifies HTTPS and HTTP endpoints.
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development" // Sets the environment to Development.
+            }
+        }
     }
-  }
 }

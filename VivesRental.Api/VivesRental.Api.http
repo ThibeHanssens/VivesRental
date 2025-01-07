@@ -1,6 +1,30 @@
 @VivesRental.Api_HostAddress = http://localhost:5000
+###OPTIONAL FOR TESTING
 
-GET {{VivesRental.Api_HostAddress}}/weatherforecast/
+### GET All Articles
+GET {{VivesRental.Api_HostAddress}}/api/articles
 Accept: application/json
 
 ###
+
+### GET Article by ID
+GET {{VivesRental.Api_HostAddress}}/api/articles/{{id}}
+Accept: application/json
+
+###
+
+### POST Create Article
+POST {{VivesRental.Api_HostAddress}}/api/articles
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "New Article",
+  "status": "Available"
+}
+
+###
+
+### DELETE Article by ID
+DELETE {{VivesRental.Api_HostAddress}}/api/articles/{{id}}
+Accept: application/json
