@@ -1,28 +1,32 @@
+using Microsoft.EntityFrameworkCore;
+using VivesRental.Repository.Core;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
-// Registers controllers to handle incoming HTTP requests.
+builder.Services.AddControllers(); // Registreer controllers voor het verwerken van HTTP-verzoeken.
 
-builder.Services.AddEndpointsApiExplorer();
-// Enables endpoint documentation.
+builder.Services.AddEndpointsApiExplorer(); // Activeert endpoint-documentatie.
+builder.Services.AddSwaggerGen(); // Voeg Swagger toe voor API-documentatie.
 
-builder.Services.AddSwaggerGen();
-// Adds Swagger generation for API documentation.
+// Voeg DbContext toe en configureer de verbinding met SQL Server via appsettings.json.
+builder.Services.AddDbContext<VivesRentalDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("VivesRentalDatabase")));
+// Gebruik de connection string uit de configuratie om verbinding te maken met de database.
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger(); // Serves the Swagger-generated OpenAPI document.
-    app.UseSwaggerUI(); // Enables the Swagger UI for testing endpoints.
+    app.UseSwagger(); // Activeer Swagger-documentatie in ontwikkelmodus.
+    app.UseSwaggerUI(); // Activeer de Swagger UI voor interactie met endpoints.
 }
 
-app.UseHttpsRedirection(); // Redirects HTTP requests to HTTPS.
+app.UseHttpsRedirection(); // Forceer HTTPS-verkeer.
 
-app.UseAuthorization(); // Adds middleware for authorization.
+app.UseAuthorization(); // Voeg middleware toe voor autorisatie.
 
-app.MapControllers(); // Maps controller endpoints.
+app.MapControllers(); // Map controllers naar routes.
 
-app.Run(); // Runs the application.
+app.Run(); // Start de applicatie.
