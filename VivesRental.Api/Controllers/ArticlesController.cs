@@ -80,11 +80,11 @@ namespace VivesRental.Api.Controllers
         // DELETE: api/articles/{id}
         // Endpoint om een artikel te verwijderen
         [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             try
             {
-                var result = _articleService.Remove(id);
+                var result = await _articleService.Remove(id); // Await de Task<bool>
                 if (!result)
                 {
                     return NotFound($"Artikel met ID {id} niet gevonden.");
