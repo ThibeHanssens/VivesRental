@@ -3,98 +3,98 @@ using VivesRental.Services;
 using VivesRental.Services.Model.Results;
 using VivesRental.Services.Model.Requests;
 
-namespace VivesRental.Api.Controllers
+namespace VivesRental.Api.Controllers;
+
+// **Controller voor artikelen**:
+// Beheert alle API-endpoints die gerelateerd zijn aan Artikelen.
+[ApiController]
+[Route("api/[controller]")]
+public class ArticlesController : ControllerBase
 {
-    // Deze controller beheert alle endpoints die gerelateerd zijn aan Articles
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ArticlesController : ControllerBase
+    private readonly ArticleService _articleService;
+
+    // **Dependency Injection**:
+    // De ArticleService wordt via de constructor geïnjecteerd en beheert de logica voor artikelen.
+    public ArticlesController(ArticleService articleService)
     {
-        private readonly ArticleService _articleService;
+        _articleService = articleService;
+    }
 
-        // Dependency Injection van ArticleService via de constructor
-        public ArticlesController(ArticleService articleService)
+    // **GET: api/articles**:
+    // Haalt een lijst op van alle beschikbare artikelen.
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ArticleResult>>> GetAll()
+    {
+        try
         {
-            _articleService = articleService; // De service wordt gebruikt om logica te beheren
+            // Gebruik de ArticleService om artikelen op te halen.
+            var articles = await _articleService.Find(null);
+            return Ok(articles); // Retourneert een 200-status met de lijst van artikelen.
         }
-
-        // GET: api/articles
-        // Endpoint om alle artikelen op te halen
-        [HttpGet]
-        public ActionResult<IEnumerable<ArticleResult>> GetAll()
+        catch (Exception ex)
         {
-            try
-            {
-                // Gebruik van de service om data op te halen
-                var articles = _articleService.Find(null);
-                return Ok(articles); // Retourneert een 200-status met data
-            }
-            catch (Exception ex)
-            {
-                // Foutafhandeling voor onverwachte problemen
-                return StatusCode(500, $"Interne fout: {ex.Message}");
-            }
+            return StatusCode(500, $"Interne fout: {ex.Message}");
         }
+    }
 
-        // GET: api/articles/{id}
-        // Endpoint om een specifiek artikel op te halen via ID
-        [HttpGet("{id}")]
-        public ActionResult<ArticleResult> GetById(Guid id)
+    // **GET: api/articles/{id}**:
+    // Haalt een specifiek artikel op op basis van ID.
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ArticleResult>> GetById(Guid id)
+    {
+        try
         {
-            try
+            var article = await _articleService.Get(id);
+            if (article == null)
             {
-                var article = _articleService.Get(id);
-                if (article == null)
-                {
-                    return NotFound($"Artikel met ID {id} niet gevonden.");
-                }
-                return Ok(article);
+                return NotFound($"Artikel met ID {id} niet gevonden.");
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Interne fout: {ex.Message}");
-            }
+            return Ok(article);
         }
-
-        // POST: api/articles
-        // Endpoint om een nieuw artikel toe te voegen
-        [HttpPost]
-        public ActionResult<ArticleResult> Create([FromBody] ArticleRequest request)
+        catch (Exception ex)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState); // Validatie van het request
-                }
-
-                var createdArticle = _articleService.Create(request);
-                return CreatedAtAction(nameof(GetById), new { id = createdArticle.Id }, createdArticle);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Interne fout: {ex.Message}");
-            }
+            return StatusCode(500, $"Interne fout: {ex.Message}");
         }
+    }
 
-        // DELETE: api/articles/{id}
-        // Endpoint om een artikel te verwijderen
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+    // **POST: api/articles**:
+    // Maakt een nieuw artikel aan op basis van een ArticleRequest.
+    [HttpPost]
+    public async Task<ActionResult<ArticleResult>> Create([FromBody] ArticleRequest request)
+    {
+        try
         {
-            try
+            if (!ModelState.IsValid)
             {
-                var result = await _articleService.Remove(id); // Await de Task<bool>
-                if (!result)
-                {
-                    return NotFound($"Artikel met ID {id} niet gevonden.");
-                }
-                return NoContent(); // Retourneert een 204-status (geen inhoud)
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
+
+            var createdArticle = await _articleService.Create(request);
+            return CreatedAtAction(nameof(GetById), new { id = createdArticle.Id }, createdArticle);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Interne fout: {ex.Message}");
+        }
+    }
+
+    // **DELETE: api/articles/{id}**:
+    // Verwijdert een artikel op basis van ID.
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            var result = await _articleService.Remove(id);
+            if (!result)
             {
-                return StatusCode(500, $"Interne fout: {ex.Message}");
+                return NotFound($"Artikel met ID {id} niet gevonden.");
             }
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Interne fout: {ex.Message}");
         }
     }
 }

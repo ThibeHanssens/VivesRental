@@ -1,32 +1,61 @@
 using Microsoft.EntityFrameworkCore;
 using VivesRental.Repository.Core;
+using VivesRental.Services; // Zorg ervoor dat de services worden herkend door Dependency Injection.
+using System.Text.Json.Serialization;
+using System.Text.Json; // Nodig voor JSON-instellingen.
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args); // Maakt en configureert de applicatie.
 
-// Add services to the container.
-builder.Services.AddControllers(); // Registreer controllers voor het verwerken van HTTP-verzoeken.
+// **Controllers registreren**:
+// Hiermee worden alle controllers in het project geregistreerd. JSON-opties worden ingesteld om potentiële problemen zoals cyclische referenties te voorkomen.
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Negeer cyclische referenties in JSON-output.
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 
-builder.Services.AddEndpointsApiExplorer(); // Activeert endpoint-documentatie.
-builder.Services.AddSwaggerGen(); // Voeg Swagger toe voor API-documentatie.
+        // Zorg ervoor dat JSON-eigenschappen in camelCase worden geschreven.
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 
-// Voeg DbContext toe en configureer de verbinding met SQL Server via appsettings.json.
+        // Negeer velden met een null-waarde om data te vereenvoudigen.
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
+
+// **Swagger configureren**:
+// Hiermee wordt Swagger gebruikt voor documentatie van de API.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// **Database Context registreren**:
+// De VivesRentalDbContext wordt geregistreerd met een SQL Server-connectiestring uit `appsettings.json`.
 builder.Services.AddDbContext<VivesRentalDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("VivesRentalDatabase")));
-// Gebruik de connection string uit de configuratie om verbinding te maken met de database.
 
-var app = builder.Build();
+// **Services registreren**:
+// Dit zijn de services die gebruikt worden in de applicatie. Dependency Injection zorgt ervoor dat deze beschikbaar zijn in de controllers.
+builder.Services.AddScoped<ArticleService>();
+builder.Services.AddScoped<CustomerService>();
+builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<ArticleReservationService>();
+builder.Services.AddScoped<OrderLineService>();
+builder.Services.AddScoped<ProductService>();
 
-// Configure the HTTP request pipeline.
+var app = builder.Build(); // Bouw de applicatie op.
+
+// **Swagger activeren in ontwikkelmodus**:
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger(); // Activeer Swagger-documentatie in ontwikkelmodus.
-    app.UseSwaggerUI(); // Activeer de Swagger UI voor interactie met endpoints.
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection(); // Forceer HTTPS-verkeer.
+// **Middleware voor veilige communicatie**:
+app.UseHttpsRedirection(); // Verplicht het gebruik van HTTPS.
 
-app.UseAuthorization(); // Voeg middleware toe voor autorisatie.
+// **Autorisatie instellen**:
+app.UseAuthorization(); // Middleware voor eventuele toekomstige autorisatie.
 
-app.MapControllers(); // Map controllers naar routes.
+// **Controllers koppelen aan routes**:
+app.MapControllers(); // Maakt alle API-endpoints bereikbaar.
 
 app.Run(); // Start de applicatie.

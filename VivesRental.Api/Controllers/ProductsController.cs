@@ -1,137 +1,126 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VivesRental.Services;
-using VivesRental.Services.Model.Requests;
 using VivesRental.Services.Model.Results;
+using VivesRental.Services.Model.Requests;
 
-namespace VivesRental.Api.Controllers
+namespace VivesRental.Api.Controllers;
+
+// **Controller voor producten**:
+// Beheert alle API-endpoints die gerelateerd zijn aan Producten.
+[ApiController]
+[Route("api/[controller]")]
+public class ProductsController : ControllerBase
 {
-    // Deze controller beheert alle endpoints die gerelateerd zijn aan producten
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    private readonly ProductService _productService;
+
+    // **Dependency Injection**:
+    // De ProductService wordt via de constructor geïnjecteerd en beheert de logica voor producten.
+    public ProductsController(ProductService productService)
     {
-        private readonly ProductService _productService;
+        _productService = productService;
+    }
 
-        // Dependency Injection van ProductService via de constructor
-        public ProductsController(ProductService productService)
+    // **GET: api/products**:
+    // Haalt een lijst op van alle beschikbare producten.
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ProductResult>>> GetAll()
+    {
+        try
         {
-            _productService = productService; // De service wordt gebruikt om logica te beheren
+            // Gebruik de ProductService om producten op te halen.
+            var products = await _productService.Find(null);
+            return Ok(products); // Retourneert een 200-status met de lijst van producten.
         }
-
-        // GET: api/products
-        // Endpoint om alle producten op te halen
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductResult>>> GetAll()
+        catch (Exception ex)
         {
-            try
-            {
-                // Haal alle producten op via de service
-                var products = await _productService.Find(null);
-                return Ok(products); // Retourneer een 200-status met data
-            }
-            catch (Exception ex)
-            {
-                // Foutafhandeling voor onverwachte problemen
-                return StatusCode(500, $"Interne fout: {ex.Message}");
-            }
+            // Foutafhandeling bij onverwachte fouten.
+            return StatusCode(500, $"Interne fout: {ex.Message}");
         }
+    }
 
-        // GET: api/products/{id}
-        // Endpoint om een specifiek product op te halen via ID
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ProductResult>> GetById(Guid id)
+    // **GET: api/products/{id}**:
+    // Haalt een specifiek product op op basis van ID.
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ProductResult>> GetById(Guid id)
+    {
+        try
         {
-            try
+            var product = await _productService.Get(id);
+            if (product == null)
             {
-                var product = await _productService.Get(id);
-                if (product == null)
-                {
-                    // Retourneer een 404-status als het product niet bestaat
-                    return NotFound($"Product met ID {id} niet gevonden.");
-                }
-                return Ok(product); // Retourneer een 200-status met het product
+                return NotFound($"Product met ID {id} niet gevonden."); // Retourneert een 404-status.
             }
-            catch (Exception ex)
-            {
-                // Foutafhandeling voor onverwachte problemen
-                return StatusCode(500, $"Interne fout: {ex.Message}");
-            }
+            return Ok(product); // Retourneert een 200-status met het product.
         }
-
-        // POST: api/products
-        // Endpoint om een nieuw product toe te voegen
-        [HttpPost]
-        public async Task<ActionResult<ProductResult>> Create([FromBody] ProductRequest request)
+        catch (Exception ex)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    // Controleer of het request voldoet aan de validatieregels
-                    return BadRequest(ModelState);
-                }
-
-                // Creëer een nieuw product via de service
-                var createdProduct = await _productService.Create(request);
-                return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
-            }
-            catch (Exception ex)
-            {
-                // Foutafhandeling voor onverwachte problemen
-                return StatusCode(500, $"Interne fout: {ex.Message}");
-            }
+            return StatusCode(500, $"Interne fout: {ex.Message}");
         }
+    }
 
-        // PUT: api/products/{id}
-        // Endpoint om een bestaand product te bewerken
-        [HttpPut("{id}")]
-        public async Task<ActionResult<ProductResult>> Update(Guid id, [FromBody] ProductRequest request)
+    // **POST: api/products**:
+    // Maakt een nieuw product aan op basis van een ProductRequest.
+    [HttpPost]
+    public async Task<ActionResult<ProductResult>> Create([FromBody] ProductRequest request)
+    {
+        try
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    // Controleer of het request voldoet aan de validatieregels
-                    return BadRequest(ModelState);
-                }
+                return BadRequest(ModelState); // Controleert of het request valide is.
+            }
 
-                // Bewerk een bestaand product via de service
-                var updatedProduct = await _productService.Edit(id, request);
-                if (updatedProduct == null)
-                {
-                    // Retourneer een 404-status als het product niet bestaat
-                    return NotFound($"Product met ID {id} niet gevonden.");
-                }
-                return Ok(updatedProduct); // Retourneer een 200-status met het geüpdatete product
-            }
-            catch (Exception ex)
-            {
-                // Foutafhandeling voor onverwachte problemen
-                return StatusCode(500, $"Interne fout: {ex.Message}");
-            }
+            var createdProduct = await _productService.Create(request);
+            return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
         }
-
-        // DELETE: api/products/{id}
-        // Endpoint om een product te verwijderen
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        catch (Exception ex)
         {
-            try
+            return StatusCode(500, $"Interne fout: {ex.Message}");
+        }
+    }
+
+    // **PUT: api/products/{id}**:
+    // Wijzigt een bestaand product op basis van ID en een ProductRequest.
+    [HttpPut("{id}")]
+    public async Task<ActionResult<ProductResult>> Update(Guid id, [FromBody] ProductRequest request)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
             {
-                // Verwijder het product via de service
-                var result = await _productService.Remove(id);
-                if (!result)
-                {
-                    // Retourneer een 404-status als het product niet bestaat
-                    return NotFound($"Product met ID {id} niet gevonden.");
-                }
-                return NoContent(); // Retourneer een 204-status (geen inhoud)
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
+
+            var updatedProduct = await _productService.Edit(id, request);
+            if (updatedProduct == null)
             {
-                // Foutafhandeling voor onverwachte problemen
-                return StatusCode(500, $"Interne fout: {ex.Message}");
+                return NotFound($"Product met ID {id} niet gevonden.");
             }
+            return Ok(updatedProduct);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Interne fout: {ex.Message}");
+        }
+    }
+
+    // **DELETE: api/products/{id}**:
+    // Verwijdert een product op basis van ID.
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            var result = await _productService.Remove(id);
+            if (!result)
+            {
+                return NotFound($"Product met ID {id} niet gevonden.");
+            }
+            return NoContent(); // Retourneert een 204-status.
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Interne fout: {ex.Message}");
         }
     }
 }

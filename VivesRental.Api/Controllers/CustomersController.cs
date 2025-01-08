@@ -2,98 +2,98 @@
 using VivesRental.Services;
 using VivesRental.Services.Model.Results;
 using VivesRental.Services.Model.Requests;
-using VivesRental.Services.Abstractions;
 
-namespace VivesRental.Api.Controllers
+namespace VivesRental.Api.Controllers;
+
+// **Controller voor klanten**:
+// Beheert alle API-endpoints die gerelateerd zijn aan Klanten.
+[ApiController]
+[Route("api/[controller]")]
+public class CustomersController : ControllerBase
 {
-    // Deze controller beheert alle endpoints die gerelateerd zijn aan Customers
-    [ApiController]
-    [Route("api/[controller]")]
-    public class CustomersController : ControllerBase
+    private readonly CustomerService _customerService;
+
+    // **Dependency Injection**:
+    // De CustomerService wordt via de constructor geïnjecteerd en beheert de logica voor klanten.
+    public CustomersController(CustomerService customerService)
     {
-        private readonly CustomerService _customerService;
+        _customerService = customerService;
+    }
 
-        // Dependency Injection van CustomerService via de constructor
-        public CustomersController(CustomerService customerService)
+    // **GET: api/customers**:
+    // Haalt een lijst op van alle klanten.
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<CustomerResult>>> GetAll()
+    {
+        try
         {
-            _customerService = customerService; // De service wordt gebruikt om logica te beheren
+            var customers = await _customerService.Find(null);
+            return Ok(customers);
         }
-
-        // GET: api/customers
-        // Endpoint om alle klanten op te halen
-        [HttpGet]
-        public ActionResult<IEnumerable<CustomerResult>> GetAll()
+        catch (Exception ex)
         {
-            try
-            {
-                var customers = _customerService.Find(null); // Haalt alle klanten op
-                return Ok(customers); // Retourneert een 200-status met data
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Interne fout: {ex.Message}");
-            }
+            return StatusCode(500, $"Interne fout: {ex.Message}");
         }
+    }
 
-        // GET: api/customers/{id}
-        // Endpoint om een specifieke klant op te halen via ID
-        [HttpGet("{id}")]
-        public ActionResult<CustomerResult> GetById(Guid id)
+    // **GET: api/customers/{id}**:
+    // Haalt een specifieke klant op op basis van ID.
+    [HttpGet("{id}")]
+    public async Task<ActionResult<CustomerResult>> GetById(Guid id)
+    {
+        try
         {
-            try
+            var customer = await _customerService.Get(id);
+            if (customer == null)
             {
-                var customer = _customerService.Get(id); // Haalt een specifieke klant op
-                if (customer == null)
-                {
-                    return NotFound($"Klant met ID {id} niet gevonden.");
-                }
-                return Ok(customer);
+                return NotFound($"Klant met ID {id} niet gevonden.");
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Interne fout: {ex.Message}");
-            }
+            return Ok(customer);
         }
-
-        // POST: api/customers
-        // Endpoint om een nieuwe klant te creëren
-        [HttpPost]
-        public ActionResult<CustomerResult> Create([FromBody] CustomerRequest request)
+        catch (Exception ex)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState); // Controleert of het request valide is
-                }
-
-                var createdCustomer = _customerService.Create(request); // Maakt een nieuwe klant aan
-                return CreatedAtAction(nameof(GetById), new { id = createdCustomer.Id }, createdCustomer);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Interne fout: {ex.Message}");
-            }
+            return StatusCode(500, $"Interne fout: {ex.Message}");
         }
+    }
 
-        // DELETE: api/customers/{id}
-        // Endpoint om een klant te verwijderen
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+    // **POST: api/customers**:
+    // Maakt een nieuwe klant aan op basis van een CustomerRequest.
+    [HttpPost]
+    public async Task<ActionResult<CustomerResult>> Create([FromBody] CustomerRequest request)
+    {
+        try
         {
-            try
+            if (!ModelState.IsValid)
             {
-                var result = await _customerService.Remove(id); // Await de Task<bool> en verwijdert de klant
-                if (!result)
-                {
-                    return NotFound($"Klant met ID {id} niet gevonden.");
-                }
-                return NoContent(); // Retourneert een 204-status (geen inhoud)
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
+
+            var createdCustomer = await _customerService.Create(request);
+            return CreatedAtAction(nameof(GetById), new { id = createdCustomer.Id }, createdCustomer);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Interne fout: {ex.Message}");
+        }
+    }
+
+    // **DELETE: api/customers/{id}**:
+    // Verwijdert een klant op basis van ID.
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            var result = await _customerService.Remove(id);
+            if (!result)
             {
-                return StatusCode(500, $"Interne fout: {ex.Message}");
+                return NotFound($"Klant met ID {id} niet gevonden.");
             }
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Interne fout: {ex.Message}");
         }
     }
 }
