@@ -1,0 +1,32 @@
+﻿@page "/"
+@inject NavigationManager Navigation
+
+<div class="dashboard">
+    <h1>VIVES Rental Dashboard</h1>
+    <p>Welkom! Kies een actie:</p>
+
+    <div class="dashboard-buttons">
+        <button class="action-button" @onclick="NavigateToProductManagement">Productbeheer</button>
+        <button class="action-button" @onclick="NavigateToArticleManagement">Artikelbeheer</button>
+        <button class="action-button" @onclick="NavigateToNewRentalOrder">Nieuwe verhuurorder</button>
+        <button class="action-button" @onclick="NavigateToReturnOrder">Retourneren</button>
+    </div>
+</div>
+
+@code {
+    // Navigatie naar productbeheer.
+    private void NavigateToProductManagement() =>
+        Navigation.NavigateTo("/products");
+
+    // Navigatie naar artikelbeheer.
+    private void NavigateToArticleManagement() =>
+        Navigation.NavigateTo("/articles");
+
+    // Navigatie naar het aanmaken van een nieuwe verhuurorder.
+    private void NavigateToNewRentalOrder() =>
+        Navigation.NavigateTo("/rental-orders");
+
+    // Navigatie naar retourpagina.
+    private void NavigateToReturnOrder() =>
+        Navigation.NavigateTo("/return-order");
+}

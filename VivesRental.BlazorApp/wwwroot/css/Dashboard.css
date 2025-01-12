@@ -1,0 +1,33 @@
+/* **Dashboard CSS** */
+/* Algemene opmaak voor het dashboard */
+.dashboard {
+    padding: 2rem;
+    text-align: center;
+    background-color: #ffffff; /* VIVES wit */
+}
+
+/* Knoppen worden gecentreerd en met ruimte tussen weergegeven */
+.dashboard-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+/* Hoofdknoppen in VIVES-rood */
+.action-button {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    color: #ffffff; /* Wit */
+    background-color: #e30613; /* VIVES rood */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    /* Hover-effect: iets donkerder rood */
+    .action-button:hover {
+        background-color: #ba0510; /* Donkerder rood */
+    }

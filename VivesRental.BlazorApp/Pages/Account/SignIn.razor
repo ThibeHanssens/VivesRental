@@ -1,0 +1,48 @@
+﻿@attribute [Route(AppRoutes.Account.SignIn)] // **Route Attribuut**: Verbindt deze pagina met de route `/account/sign-in`.
+
+@inject NavigationManager NavigationManager // **NavigationManager**: Wordt gebruikt om de gebruiker te navigeren naar andere routes na een succesvolle login.
+@inject AuthenticationStateProvider AuthenticationStateProvider // **AuthenticationStateProvider**: Beheert de authenticatiestatus van de gebruiker.
+@inject IBearerTokenStore TokenStore // **IBearerTokenStore**: Beheert het opslaan en ophalen van JWT-tokens in LocalStorage.
+
+<!-- Container voor inloggen -->
+<div class="signin-container">
+    <h2>Inloggen</h2>
+    <div>
+        <!-- E-mailadres invoerveld -->
+        <input type="text" @bind="Email" placeholder="E-mail" />
+        <!-- Wachtwoord invoerveld -->
+        <input type="password" @bind="Password" placeholder="Wachtwoord" />
+        <!-- Inlogknop -->
+        <button @onclick="Login">Inloggen</button>
+    </div>
+</div>
+
+@code {
+    // **Email**: Ingevoerde e-mail door de gebruiker.
+    private string? Email { get; set; }
+
+    // **Password**: Ingevoerd wachtwoord door de gebruiker.
+    private string? Password { get; set; }
+
+    // **Login**: Handelt het inlogproces af en stelt de authenticatiestatus in.
+    private async Task Login()
+    {
+        // Controleer of de invoervelden zijn ingevuld.
+        if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+        {
+            return; // Stop als velden leeg zijn.
+        }
+
+        // **TODO**: Vervang dit met een API-aanroep om een geldig token op te halen.
+        string token = "dummy-jwt-token";
+
+        // Sla het token op in de opslag.
+        TokenStore.SetToken(token);
+
+        // Informeer de applicatie over de nieuwe authenticatiestatus.
+        ((TokenAuthenticationStateProvider)AuthenticationStateProvider).AuthenticateUser();
+
+        // Redirect naar de startpagina na een succesvolle login.
+        NavigationManager.NavigateTo(AppRoutes.Home.Index);
+    }
+}

@@ -1,0 +1,45 @@
+/* Container styling voor de inlogpagina */
+.signin-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10%;
+    color: #000; /* Zwarte tekstkleur voor consistentie */
+}
+
+/* Invoer velden styling */
+input {
+    margin: 10px 0;
+    padding: 10px;
+    width: 80%;
+    max-width: 300px;
+    border: 1px solid #ccc; /* Neutrale randkleur */
+    border-radius: 5px; /* Subtiele afronding */
+    font-size: 1em;
+}
+
+    /* Styling voor invoervelden bij focus */
+    input:focus {
+        outline: none;
+        border-color: #e30613; /* VIVES-rood bij focus */
+        box-shadow: 0 0 5px rgba(227, 6, 19, 0.5); /* Lichtrood schaduw bij focus */
+    }
+
+/* Knop styling */
+button {
+    padding: 10px;
+    background-color: #e30613; /* Hoofdkleur: VIVES-rood */
+    color: #fff; /* Witte tekst */
+    border: none;
+    cursor: pointer;
+    width: 80%;
+    max-width: 300px;
+    font-size: 1em;
+    border-radius: 5px; /* Subtiele afronding */
+    transition: background-color 0.3s ease; /* Soepele overgang bij hover */
+}
+
+    /* Hover-styling voor de knop */
+    button:hover {
+        background-color: #a2040e; /* Donkerdere tint van rood */
+    }

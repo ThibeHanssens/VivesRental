@@ -1,12 +1,31 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿// **Routing en autorisatie configureren**
+// Deze component definieert hoe de applicatie routes afhandelt en controleert op autorisatie.
+
+@using Microsoft.AspNetCore.Components.Authorization // Ondersteunt autorisatie via claims.
+@using VivesRental.BlazorApp // Toegang tot applicatiespecifieke routes en componenten.
+@inject NavigationManager NavigationManager // Helpt bij navigatie tussen pagina's.
+
+<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <!-- Controleer autorisatie voor de gevonden route -->
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            <NotAuthorized>
+                @* Redirect naar inlogpagina als gebruiker niet geautoriseerd is *@
+                @{
+                    var signInRoute = AppRoutes.Account.SignIn;
+                    var uri = NavigationManager.Uri;
+                    var baseUri = NavigationManager.BaseUri;
+                    var relativeUrl = uri.Substring(baseUri.Length - 1, uri.Length - baseUri.Length + 1);
+                    NavigationManager.NavigateTo($"{signInRoute}?returnUrl={relativeUrl}");
+                }
+            </NotAuthorized>
+        </AuthorizeRouteView>
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
     <NotFound>
-        <PageTitle>Not found</PageTitle>
+        <PageTitle>Pagina Niet Gevonden</PageTitle>
         <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
+            <p role="alert">Sorry, de gevraagde pagina bestaat niet.</p>
         </LayoutView>
     </NotFound>
 </Router>

@@ -1,0 +1,35 @@
+/* **Laadscherm CSS** */
+/* De achtergrondkleur is wit (#ffffff), passend bij het VIVES-thema */
+.loading-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #ffffff; /* VIVES wit */
+}
+
+/* Voeg een draai-animatie toe aan het VIVES-logo */
+.loading-logo {
+    width: 150px;
+    animation: spin 2s linear infinite; /* 2 seconden draaien, herhaalt eindeloos */
+    margin-bottom: 20px;
+}
+
+/* De tekstkleur is zwart (#000000), passend bij VIVES */
+.loading-screen p {
+    font-size: 1.2em;
+    color: #000000; /* Zwart */
+    font-weight: bold;
+}
+
+/* Draai-animatie definitie */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
