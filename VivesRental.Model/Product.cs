@@ -11,5 +11,10 @@ public class Product
     public string? Publisher { get; set; }
     public int RentalExpiresAfterDays { get; set; }
 
+    // **Afbeelding URL**:
+    // URL of pad naar een afbeelding van het product.
+    // Deze kan worden gebruikt om een visuele representatie van het product te tonen in de UI.
+    public string? ImageUrl { get; set; }
+
     public IList<Article> Articles { get; set; } = new List<Article>();
 }

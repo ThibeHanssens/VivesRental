@@ -9,4 +9,5 @@ public class ProductRequest
     public string? Manufacturer { get; set; }
     public string? Publisher { get; set; }
     public int RentalExpiresAfterDays { get; set; }
+    public string? ImageUrl { get; set; } // Nieuwe eigenschap
 }

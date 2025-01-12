@@ -70,6 +70,13 @@ public class ProductsController : ControllerBase
                 return BadRequest(ModelState); // Controleert of het request valide is.
             }
 
+            // **Validatie voor de ImageUrl**:
+            // Controleert of de opgegeven URL geldig is. Als dit niet het geval is, genereert het een standaard-URL op basis van de productnaam.
+            if (!IsValidUrl(request.ImageUrl))
+            {
+                request.ImageUrl = GenerateImageUrl(request.Name);
+            }
+
             var createdProduct = await _productService.Create(request);
             return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
         }
@@ -89,6 +96,13 @@ public class ProductsController : ControllerBase
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // **Validatie voor de ImageUrl**:
+            // Controleert of de opgegeven URL geldig is. Als dit niet het geval is, genereert het een standaard-URL op basis van de productnaam.
+            if (!IsValidUrl(request.ImageUrl))
+            {
+                request.ImageUrl = GenerateImageUrl(request.Name);
             }
 
             var updatedProduct = await _productService.Edit(id, request);
@@ -122,5 +136,24 @@ public class ProductsController : ControllerBase
         {
             return StatusCode(500, $"Interne fout: {ex.Message}");
         }
+    }
+
+    // **Helperfunctie voor URL-validatie**:
+    // Controleert of een string een geldige URL is.
+    private bool IsValidUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return false; // Lege of null waarde is ongeldig.
+        }
+
+        return Uri.TryCreate(url, UriKind.Absolute, out _); // Controleert of de string een geldige absolute URL is.
+    }
+
+    // **Helperfunctie om een afbeelding-URL te genereren**:
+    // Gebruikt de naam van het product om een dynamische URL te maken voor een placeholder-afbeelding.
+    private string GenerateImageUrl(string productName)
+    {
+        return $"https://dummyimage.com/300x300/000/fff&text={Uri.EscapeDataString(productName)}";
     }
 }

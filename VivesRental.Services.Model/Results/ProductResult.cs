@@ -10,4 +10,5 @@ public class ProductResult
     public int RentalExpiresAfterDays { get; set; }
     public int NumberOfArticles { get; set; }
     public int NumberOfAvailableArticles { get; set; }
+    public string? ImageUrl { get; set; } // Nieuwe eigenschap
 }

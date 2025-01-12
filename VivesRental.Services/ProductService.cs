@@ -14,12 +14,15 @@ namespace VivesRental.Services;
 public class ProductService : IProductService
 {
     private readonly VivesRentalDbContext _context;
+
+    // **Constructor**:
+    // De databasecontext wordt geïnjecteerd via Dependency Injection.
     public ProductService(VivesRentalDbContext context)
     {
         _context = context;
     }
 
-
+    // **Haalt een specifiek product op**:
     public Task<ProductResult?> Get(Guid id)
     {
         return _context.Products
@@ -28,24 +31,32 @@ public class ProductService : IProductService
             .FirstOrDefaultAsync();
     }
 
+    // **Zoekt producten met een filter**:
     public Task<List<ProductResult>> Find(ProductFilter? filter = null)
     {
-
         return _context.Products
             .ApplyFilter(filter)
             .MapToResults(filter)
             .ToListAsync();
     }
 
+    // **Voegt een nieuw product toe**:
     public async Task<ProductResult?> Create(ProductRequest entity)
     {
+        // Controleert of de URL geldig is. Als de URL ongeldig is, wordt een standaard URL ingesteld.
+        if (!IsValidUrl(entity.ImageUrl))
+        {
+            entity.ImageUrl = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fnl.wikipedia.org%2Fwiki%2FHogeschool_VIVES&psig=AOvVaw2p0j1SFap9Ok9Ynu1ZbgP0&ust=1736754822854000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMj0iYXa74oDFQAAAAAdAAAAABAE";
+        }
+
         var product = new Product
         {
             Name = entity.Name,
             Description = entity.Description,
             Manufacturer = entity.Manufacturer,
             Publisher = entity.Publisher,
-            RentalExpiresAfterDays = entity.RentalExpiresAfterDays
+            RentalExpiresAfterDays = entity.RentalExpiresAfterDays,
+            ImageUrl = entity.ImageUrl
         };
 
         _context.Products.Add(product);
@@ -53,25 +64,43 @@ public class ProductService : IProductService
         return await Get(product.Id);
     }
 
+    // **Wijzigt een bestaand product**:
     public async Task<ProductResult?> Edit(Guid id, ProductRequest entity)
     {
-        var product = await _context.Products
-            .FirstOrDefaultAsync(p => p.Id == id);
+        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null)
         {
-            return null;
+            return null; // Retourneert null als het product niet bestaat.
         }
-            
+
+        // Controleert of de URL geldig is. Als de URL ongeldig is, wordt een standaard URL ingesteld.
+        if (!IsValidUrl(entity.ImageUrl))
+        {
+            entity.ImageUrl = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fnl.wikipedia.org%2Fwiki%2FHogeschool_VIVES&psig=AOvVaw2p0j1SFap9Ok9Ynu1ZbgP0&ust=1736754822854000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMj0iYXa74oDFQAAAAAdAAAAABAE";
+        }
+
+        // Update de eigenschappen van het product.
         product.Name = entity.Name;
         product.Description = entity.Description;
         product.Manufacturer = entity.Manufacturer;
         product.Publisher = entity.Publisher;
         product.RentalExpiresAfterDays = entity.RentalExpiresAfterDays;
+        product.ImageUrl = entity.ImageUrl;
 
         await _context.SaveChangesAsync();
-
         return await Get(product.Id);
+    }
+
+    // **Valideert een URL**:
+    private bool IsValidUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return false;
+        }
+
+        return Uri.TryCreate(url, UriKind.Absolute, out _);
     }
 
     /// <summary>
