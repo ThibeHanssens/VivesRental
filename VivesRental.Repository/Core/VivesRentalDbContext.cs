@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using VivesRental.Model;
 using VivesRental.Repository.Extensions;
 
@@ -42,5 +43,15 @@ public class VivesRentalDbContext : DbContext
             Password = BCrypt.Net.BCrypt.HashPassword("1234"), // Gebruik BCrypt voor hashing
             Role = "Admin"
         });
+    }
+
+    // **Suppress PendingModelChangesWarning**:
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+
+        // Onderdruk waarschuwingen voor niet-verwerkte modelwijzigingen
+        optionsBuilder.ConfigureWarnings(warnings =>
+            warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
     }
 }

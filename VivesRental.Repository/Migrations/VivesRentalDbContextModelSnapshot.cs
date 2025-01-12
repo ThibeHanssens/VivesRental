@@ -222,8 +222,8 @@ namespace VivesRental.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c2f94ba9-f211-48d8-88dc-da74573c1975"),
-                            Password = "$2a$11$KnBj7OcciIzB9uZ1N6OdhubwW5IK53JoWaYMkeRdn3uiHftsGtFNW",
+                            Id = new Guid("f82c1ba9-170e-4a98-8d90-81591e0d12e4"),
+                            Password = "$2a$11$7iqk9aDhy8aC2XIpgT7FiOQh7YbyDhwyfGDORoeGdYJtFJViuDGAK",
                             Role = "Admin",
                             Username = "medewerker"
                         });

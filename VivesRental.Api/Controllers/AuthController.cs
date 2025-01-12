@@ -59,13 +59,19 @@ public class AuthController : ControllerBase
         {
             Subject = new ClaimsIdentity(new[]
             {
-                // Voeg claims toe aan het token, zoals gebruikersnaam en rol.
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role)
-            }),
-            Expires = DateTime.UtcNow.AddMinutes(30), // Token vervalt na 30 minuten.
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        new Claim(ClaimTypes.Name, user.Username),
+        new Claim(ClaimTypes.Role, user.Role)
+    }),
+            Expires = DateTime.UtcNow.AddMinutes(30),
+            Issuer = _jwtSettings.ValidIssuer, 
+            Audience = _jwtSettings.ValidAudience,
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
+                SecurityAlgorithms.HmacSha256Signature
+            )
         };
+
+
 
         var token = tokenHandler.CreateToken(tokenDescriptor); // Maak het token aan.
         return tokenHandler.WriteToken(token); // Retourneer het token als string.

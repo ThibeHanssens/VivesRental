@@ -95,16 +95,18 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; // Standaard schema voor uitdagingen.
 }).AddJwtBearer(options =>
 {
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true, // Controleer de uitgever van het token.
         ValidateAudience = true, // Controleer de doelgroep van het token.
         ValidateLifetime = true, // Controleer of het token nog geldig is.
         ValidateIssuerSigningKey = true, // Controleer de handtekening van het token.
-        ValidIssuer = "VivesRentalApi", // Specificeer de verwachte uitgever.
-        ValidAudience = "VivesRentalClient", // Specificeer de verwachte doelgroep.
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)) // Gebruik de `Secret` voor de handtekening.
+        ValidIssuer = jwtSettings.ValidIssuer, // Haalt de issuer op uit de instellingen
+        ValidAudience = jwtSettings.ValidAudience, // Haalt de audience op uit de instellingen
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
     };
+
 });
 
 // **Services registreren**:

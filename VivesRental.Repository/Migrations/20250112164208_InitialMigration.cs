@@ -157,7 +157,7 @@ namespace VivesRental.Repository.Migrations
             migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "Id", "Password", "Role", "Username" },
-                values: new object[] { new Guid("c2f94ba9-f211-48d8-88dc-da74573c1975"), "$2a$11$KnBj7OcciIzB9uZ1N6OdhubwW5IK53JoWaYMkeRdn3uiHftsGtFNW", "Admin", "medewerker" });
+                values: new object[] { new Guid("f82c1ba9-170e-4a98-8d90-81591e0d12e4"), "$2a$11$7iqk9aDhy8aC2XIpgT7FiOQh7YbyDhwyfGDORoeGdYJtFJViuDGAK", "Admin", "medewerker" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Article_ProductId",
