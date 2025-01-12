@@ -1,32 +1,24 @@
-﻿@page "/"
-@inject NavigationManager Navigation
+﻿@page "/dashboard"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize] // Alleen toegankelijk voor geauthenticeerde gebruikers.
+
+<h1 class="dashboard-title">Welkom bij het VIVES Verhuur Dashboard</h1>
 
 <div class="dashboard">
-    <h1>VIVES Rental Dashboard</h1>
-    <p>Welkom! Kies een actie:</p>
-
+    <p>Gebruik de knoppen hieronder om toegang te krijgen tot de verschillende modules.</p>
     <div class="dashboard-buttons">
-        <button class="action-button" @onclick="NavigateToProductManagement">Productbeheer</button>
-        <button class="action-button" @onclick="NavigateToArticleManagement">Artikelbeheer</button>
-        <button class="action-button" @onclick="NavigateToNewRentalOrder">Nieuwe verhuurorder</button>
-        <button class="action-button" @onclick="NavigateToReturnOrder">Retourneren</button>
+        <button class="action-button" @onclick="NavigateToProducts">Producten Beheren</button>
+        <button class="action-button" @onclick="NavigateToArticles">Artikelen Beheren</button>
+        <button class="action-button" @onclick="NavigateToOrders">Bestellingen Beheren</button>
+        <button class="action-button" @onclick="NavigateToCustomers">Klanten Beheren</button>
     </div>
 </div>
 
 @code {
-    // Navigatie naar productbeheer.
-    private void NavigateToProductManagement() =>
-        Navigation.NavigateTo("/products");
+    private void NavigateToProducts() => NavigationManager.NavigateTo(AppRoutes.Products.Index);
+    private void NavigateToArticles() => NavigationManager.NavigateTo(AppRoutes.Articles.Index);
+    private void NavigateToOrders() => NavigationManager.NavigateTo(AppRoutes.Orders.Index);
+    private void NavigateToCustomers() => NavigationManager.NavigateTo(AppRoutes.Customers.Index);
 
-    // Navigatie naar artikelbeheer.
-    private void NavigateToArticleManagement() =>
-        Navigation.NavigateTo("/articles");
-
-    // Navigatie naar het aanmaken van een nieuwe verhuurorder.
-    private void NavigateToNewRentalOrder() =>
-        Navigation.NavigateTo("/rental-orders");
-
-    // Navigatie naar retourpagina.
-    private void NavigateToReturnOrder() =>
-        Navigation.NavigateTo("/return-order");
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 }

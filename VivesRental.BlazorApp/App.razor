@@ -1,27 +1,31 @@
-﻿// **Routing en autorisatie configureren**
-// Deze component definieert hoe de applicatie routes afhandelt en controleert op autorisatie.
+﻿// **App.razor**
+// Dit bestand beheert de routing en autorisatie van de applicatie en zorgt voor een consistente gebruikerservaring.
 
-@using Microsoft.AspNetCore.Components.Authorization // Ondersteunt autorisatie via claims.
+@using Microsoft.AspNetCore.Components.Authorization // Ondersteunt autorisatie via claims en authenticatiestatus.
 @using VivesRental.BlazorApp // Toegang tot applicatiespecifieke routes en componenten.
-@inject NavigationManager NavigationManager // Helpt bij navigatie tussen pagina's.
+@inject NavigationManager NavigationManager // Injecteert NavigationManager voor navigatiefuncties.
 
 <Router AppAssembly="@typeof(App).Assembly">
+    <!-- Als een route wordt gevonden, voer deze uit: -->
     <Found Context="routeData">
-        <!-- Controleer autorisatie voor de gevonden route -->
         <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            <!-- Controleer of de gebruiker geautoriseerd is: -->
             <NotAuthorized>
-                @* Redirect naar inlogpagina als gebruiker niet geautoriseerd is *@
+                @* Redirect naar de inlogpagina als de gebruiker niet geautoriseerd is *@
                 @{
                     var signInRoute = AppRoutes.Account.SignIn;
-                    var uri = NavigationManager.Uri;
-                    var baseUri = NavigationManager.BaseUri;
+                    var uri = NavigationManager.Uri; // Huidige URL van de gebruiker.
+                    var baseUri = NavigationManager.BaseUri; // Basis-URL van de applicatie.
                     var relativeUrl = uri.Substring(baseUri.Length - 1, uri.Length - baseUri.Length + 1);
                     NavigationManager.NavigateTo($"{signInRoute}?returnUrl={relativeUrl}");
                 }
             </NotAuthorized>
         </AuthorizeRouteView>
+        <!-- Focus bij het navigeren naar een nieuwe pagina -->
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
+
+    <!-- Als een route niet wordt gevonden: -->
     <NotFound>
         <PageTitle>Pagina Niet Gevonden</PageTitle>
         <LayoutView Layout="@typeof(MainLayout)">

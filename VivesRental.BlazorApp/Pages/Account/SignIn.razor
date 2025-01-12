@@ -1,28 +1,34 @@
-﻿@attribute [Route(AppRoutes.Account.SignIn)] // **Route Attribuut**: Verbindt deze pagina met de route `/account/sign-in`.
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Vives.Presentation.Authentication
+@using VivesRental.BlazorApp.Security
+@attribute [Route(AppRoutes.Account.SignIn)] // **Route Attribuut**: Verbindt deze pagina met de route `/account/sign-in`.
 
-@inject NavigationManager NavigationManager // **NavigationManager**: Wordt gebruikt om de gebruiker te navigeren naar andere routes na een succesvolle login.
-@inject AuthenticationStateProvider AuthenticationStateProvider // **AuthenticationStateProvider**: Beheert de authenticatiestatus van de gebruiker.
-@inject IBearerTokenStore TokenStore // **IBearerTokenStore**: Beheert het opslaan en ophalen van JWT-tokens in LocalStorage.
+@inject NavigationManager NavigationManager // **NavigationManager**: Voor navigatie tussen routes.
+@inject AuthenticationStateProvider AuthenticationStateProvider // **AuthenticationStateProvider**: Beheert de authenticatiestatus van gebruikers.
+@inject IBearerTokenStore TokenStore // **IBearerTokenStore**: Voor het opslaan van JWT-tokens.
+@inject HttpClient HttpClient // **HttpClient**: Voor communicatie met de backend.
 
 <!-- Container voor inloggen -->
 <div class="signin-container">
     <h2>Inloggen</h2>
     <div>
         <!-- E-mailadres invoerveld -->
-        <input type="text" @bind="Email" placeholder="E-mail" />
+        <input type="text" @bind="Email" placeholder="E-mailadres" />
         <!-- Wachtwoord invoerveld -->
         <input type="password" @bind="Password" placeholder="Wachtwoord" />
         <!-- Inlogknop -->
         <button @onclick="Login">Inloggen</button>
     </div>
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <p class="error-message">@ErrorMessage</p> <!-- Foutmelding weergeven -->
+    }
 </div>
 
 @code {
-    // **Email**: Ingevoerde e-mail door de gebruiker.
-    private string? Email { get; set; }
-
-    // **Password**: Ingevoerd wachtwoord door de gebruiker.
-    private string? Password { get; set; }
+    private string? Email { get; set; } // Ingevoerd e-mailadres.
+    private string? Password { get; set; } // Ingevoerd wachtwoord.
+    private string? ErrorMessage { get; set; } // Voor het weergeven van foutmeldingen.
 
     // **Login**: Handelt het inlogproces af en stelt de authenticatiestatus in.
     private async Task Login()
@@ -30,19 +36,45 @@
         // Controleer of de invoervelden zijn ingevuld.
         if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
         {
-            return; // Stop als velden leeg zijn.
+            ErrorMessage = "Vul alle velden in.";
+            return;
         }
 
-        // **TODO**: Vervang dit met een API-aanroep om een geldig token op te halen.
-        string token = "dummy-jwt-token";
+        try
+        {
+            // Verstuur een inlogverzoek naar de backend API.
+            var response = await HttpClient.PostAsJsonAsync("api/authenticate", new { Username = Email, Password });
+            if (!response.IsSuccessStatusCode)
+            {
+                ErrorMessage = "Ongeldige inloggegevens.";
+                return;
+            }
 
-        // Sla het token op in de opslag.
-        TokenStore.SetToken(token);
+            var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
+            if (tokenResponse?.Token is null)
+            {
+                ErrorMessage = "Authenticatie mislukt.";
+                return;
+            }
 
-        // Informeer de applicatie over de nieuwe authenticatiestatus.
-        ((TokenAuthenticationStateProvider)AuthenticationStateProvider).AuthenticateUser();
+            // Sla het token op in de `TokenStore`.
+            TokenStore.SetToken(tokenResponse.Token);
 
-        // Redirect naar de startpagina na een succesvolle login.
-        NavigationManager.NavigateTo(AppRoutes.Home.Index);
+            // Werk de authenticatiestatus bij.
+            ((TokenAuthenticationStateProvider)AuthenticationStateProvider).AuthenticateUser();
+
+            // Navigeer naar de startpagina.
+            NavigationManager.NavigateTo(AppRoutes.Home.Index);
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Er is een fout opgetreden tijdens het inloggen.";
+        }
+    }
+
+    // Klasse om token te deserialiseren vanuit de API-respons.
+    private class TokenResponse
+    {
+        public string Token { get; set; } = string.Empty;
     }
 }

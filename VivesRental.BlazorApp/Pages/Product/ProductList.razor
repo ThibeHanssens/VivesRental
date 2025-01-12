@@ -1,0 +1,67 @@
+﻿@page "/products"
+@using VivesRental.BlazorApp.Services
+@inject IJSRuntime JSRuntime
+@inject ProductService ProductService
+@inject NavigationManager NavigationManager
+
+<h1>Producten Overzicht</h1>
+
+<button class="btn-primary" @onclick="NavigateToCreate">Nieuw Product</button>
+
+<table>
+    <thead>
+        <tr>
+            <th>Afbeelding</th>
+            <th>Naam</th>
+            <th>Beschrijving</th>
+            <th>Aantal Artikelen</th>
+            <th>Acties</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Products)
+        {
+            <tr>
+                <td>
+                    <img src="@product.ImageUrl" alt="Product Image" width="50" height="50" />
+                </td>
+                <td>@product.Name</td>
+                <td>@product.Description</td>
+                <td>@product.NumberOfArticles</td>
+                <td>
+                    <button class="btn-primary" @onclick="() => NavigateToEdit(product.Id)">Bewerken</button>
+                    <button class="btn-danger" @onclick="() => DeleteProduct(product.Id)">Verwijderen</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private IList<ProductResult> Products = new List<ProductResult>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Products = await ProductService.GetAllAsync();
+    }
+
+    private void NavigateToCreate()
+    {
+        NavigationManager.NavigateTo("/products/create");
+    }
+
+    private void NavigateToEdit(Guid id)
+    {
+        NavigationManager.NavigateTo($"/products/edit/{id}");
+    }
+
+    private async Task DeleteProduct(Guid id)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", new object[] { "Weet je zeker dat je dit product wilt verwijderen?" });
+        if (confirmed)
+        {
+            await ProductService.DeleteAsync(id);
+            Products = await ProductService.GetAllAsync();
+        }
+    }
+}

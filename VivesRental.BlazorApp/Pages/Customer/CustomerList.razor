@@ -1,0 +1,36 @@
+﻿@page "/customers"
+@using VivesRental.BlazorApp.Services
+@inject CustomerService CustomerService
+
+<h1>Klanten Beheer</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Naam</th>
+            <th>Email</th>
+            <th>Telefoonnummer</th>
+            <th>Aantal Bestellingen</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in Customers)
+        {
+            <tr>
+                <td>@customer.FirstName @customer.LastName</td>
+                <td>@customer.Email</td>
+                <td>@customer.PhoneNumber</td>
+                <td>@customer.NumberOfOrders</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private IList<CustomerResult> Customers = new List<CustomerResult>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Customers = await CustomerService.GetAllAsync();
+    }
+}

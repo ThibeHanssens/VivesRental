@@ -1,0 +1,44 @@
+﻿@page "/orders"
+@using VivesRental.BlazorApp.Services
+@inject NavigationManager NavigationManager
+@inject OrderService OrderService
+
+<h1>Bestellingen Overzicht</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Klant Naam</th>
+            <th>Email</th>
+            <th>Datum</th>
+            <th>Acties</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Orders)
+        {
+            <tr>
+                <td>@order.CustomerFirstName @order.CustomerLastName</td>
+                <td>@order.CustomerEmail</td>
+                <td>@order.CreatedAt.ToShortDateString()</td>
+                <td>
+                    <button class="btn-primary" @onclick="() => NavigateToDetails(order.Id)">Details</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private IList<OrderResult> Orders = new List<OrderResult>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Orders = await OrderService.GetAllAsync();
+    }
+
+    private void NavigateToDetails(Guid id)
+    {
+        NavigationManager.NavigateTo($"/orders/details/{id}");
+    }
+}

@@ -1,57 +1,41 @@
-﻿using System.Net.Http.Json; // Nodig voor het gebruik van GetFromJsonAsync.
-using VivesRental.Services.Model.Results; // Importeert het model voor de resultaten.
+﻿using VivesRental.Sdk;
+using VivesRental.Services.Model.Filters;
+using VivesRental.Services.Model.Results;
 
-namespace VivesRental.BlazorApp.Services
+namespace VivesRental.BlazorApp.Services;
+
+// **Service for Orders**
+public class OrderService
 {
-    // Deze service beheert alle API-aanroepen die betrekking hebben op Orders.
-    public class OrderService
+    private readonly OrderSdk _sdk;
+
+    // **Constructor**: Initializes the SDK dependency
+    public OrderService(OrderSdk sdk)
     {
-        private readonly HttpClient _httpClient;
-        // De HttpClient wordt gebruikt om communicatie met de API te faciliteren.
+        _sdk = sdk;
+    }
 
-        public OrderService(HttpClient httpClient)
-        {
-            _httpClient = httpClient; // Dependency Injection van HttpClient.
-        }
+    // **Get All Orders**: Retrieves a list of orders with optional filters
+    public async Task<IList<OrderResult>> GetAllAsync(OrderFilter? filter = null)
+    {
+        return await _sdk.Find(filter);
+    }
 
-        // Methode om alle orders op te halen via een GET-aanroep naar de API.
-        public async Task<List<OrderResult>> GetAllAsync()
-        {
-            // Haalt een lijst van OrderResult-objecten op uit de API.
-            return await _httpClient.GetFromJsonAsync<List<OrderResult>>("orders");
-        }
+    // **Get Order by ID**: Fetches a specific order by ID
+    public async Task<OrderResult?> GetByIdAsync(Guid id)
+    {
+        return await _sdk.Get(id);
+    }
 
-        // Methode om een specifiek order op te halen via een GET-aanroep naar de API.
-        public async Task<OrderResult?> GetByIdAsync(Guid id)
-        {
-            // Haalt een specifiek order op via het opgegeven ID.
-            return await _httpClient.GetFromJsonAsync<OrderResult>($"orders/{id}");
-        }
+    // **Create Order**: Adds a new order for a customer
+    public async Task<OrderResult?> CreateAsync(Guid customerId)
+    {
+        return await _sdk.Create(customerId);
+    }
 
-        // Methode om een nieuw order aan te maken via een POST-aanroep naar de API.
-        public async Task<OrderResult?> CreateAsync(Guid customerId)
-        {
-            // Stuurt een POST-aanroep met het klant-ID om een nieuw order te creëren.
-            var response = await _httpClient.PostAsJsonAsync("orders", customerId);
-
-            if (response.IsSuccessStatusCode)
-            {
-                // Retourneert het gecreëerde order als de aanroep succesvol is.
-                return await response.Content.ReadFromJsonAsync<OrderResult>();
-            }
-
-            // Retourneert null als de aanroep niet succesvol is.
-            return null;
-        }
-
-        // Methode om een order terug te brengen via een PUT-aanroep naar de API.
-        public async Task<bool> ReturnOrderAsync(Guid orderId, DateTime returnedAt)
-        {
-            // Stuurt een PUT-aanroep met de retourdatum om het order terug te brengen.
-            var response = await _httpClient.PutAsJsonAsync($"orders/{orderId}/return", returnedAt);
-
-            // Retourneert true als de aanroep succesvol is; anders false.
-            return response.IsSuccessStatusCode;
-        }
+    // **Return Order**: Marks an order as returned
+    public async Task<bool> ReturnAsync(Guid id, DateTime returnedAt)
+    {
+        return await _sdk.Return(id, returnedAt);
     }
 }

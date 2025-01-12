@@ -2,47 +2,37 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.Authorization; // Voor autorisatie via AuthenticationStateProvider
 using VivesRental.BlazorApp; // Hoofdapplicatie namespace
-using VivesRental.BlazorApp.Services; // Zorgt voor services zoals artikelen, klanten en orders.
-using Vives.Presentation.Authentication; // Voor TokenStore en TokenAuthenticationStateProvider
-using Blazored.LocalStorage; // Voor tokenopslag en andere opslag
+using VivesRental.Sdk.Extensions; // Voor SDK-integratie
+using VivesRental.BlazorApp.Settings; // Voor API-instellingen
+using Vives.Presentation.Authentication; // Voor authenticatiebeheer (TokenStore)
+using Blazored.LocalStorage;
+using VivesRental.BlazorApp.Stores;
+using VivesRental.BlazorApp.Security; // Voor tokenopslag en andere opslag
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-// **Hoofdingang van de applicatie**:
-// Configureert een Blazor WebAssembly-applicatie.
 
+// **Root componenten**:
+// Voeg de hoofdapplicatie (`App.razor`) en de head-outlet toe aan het project.
 builder.RootComponents.Add<App>("#app");
-// Hoofdcomponent van de applicatie koppelen aan het element met id 'app'.
-
 builder.RootComponents.Add<HeadOutlet>("head::after");
-// Dynamische wijzigingen in de `<head>`-sectie, zoals metadata of CSS, ondersteunen.
 
-// **Configureer API-instellingen**
+// **API-instellingen configureren**:
+// Laad de basis-URL van de API uit de configuratie en registreer de API in de DI-container.
 var apiSettings = new ApiSettings();
 builder.Configuration.GetSection(nameof(ApiSettings)).Bind(apiSettings);
-// Bind de `ApiSettings` sectie uit `appsettings.json` aan de klasse.
+builder.Services.AddApi(apiSettings.BaseUrl); // Verbindt de SDK met de opgegeven API-url.
 
-builder.Services.AddScoped(sp => new HttpClient
-{
-    BaseAddress = new Uri(apiSettings.BaseUrl) // Basis-URL voor alle API-aanroepen.
-});
-// Registreer `HttpClient` voor communicatie met de backend API.
-
-// **Blazored.LocalStorage**
+// **Token-opslag en Blazored.LocalStorage**:
+// Voeg ondersteuning toe voor lokale opslag, nodig voor tokenbeheer.
 builder.Services.AddBlazoredLocalStorage();
-// Ondersteunt lokale opslag voor tokens en andere gegevens.
+builder.Services.AddScoped<IBearerTokenStore, TokenStore>(); // Voor veilige opslag van JWT-tokens.
 
-// **JWT-authenticatie en autorisatie configureren**
-builder.Services.AddAuthorizationCore(); // Voeg autorisatie-ondersteuning toe.
+// **JWT-authenticatie configureren**:
+// Activeer autorisatie en configureer cascading authentication state.
+builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, TokenAuthenticationStateProvider>();
-// Beheer authenticatiestatus op basis van JWT-tokens.
-builder.Services.AddScoped<IBearerTokenStore, TokenStore>();
-// Sla JWT-tokens veilig op met `TokenStore`.
+builder.Services.AddCascadingAuthenticationState(); // Voor toegang tot authenticatiestatus in child-componenten.
 
-// **Applicatiespecifieke services registreren**
-builder.Services.AddScoped<ArticleService>(); // Service voor artikelbeheer.
-builder.Services.AddScoped<CustomerService>(); // Service voor klantenbeheer.
-builder.Services.AddScoped<OrderService>(); // Service voor orderbeheer.
-
-// **Bouw en start de applicatie**
+// **Bouw en start de applicatie**:
+// Bouwt de applicatie en start deze op in de browser.
 await builder.Build().RunAsync();
-// Bouwt de Blazor WebAssembly-applicatie en start deze.

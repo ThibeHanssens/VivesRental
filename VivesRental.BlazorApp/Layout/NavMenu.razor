@@ -1,39 +1,38 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">VivesRental.BlazorApp</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
-
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Vives.Presentation.Authentication
+@using VivesRental.BlazorApp.Security
+<nav class="nav-menu">
+    <ul>
+        <li>
+            <a href="@AppRoutes.Dashboard.Index">Dashboard</a>
+        </li>
+        <li>
+            <a href="@AppRoutes.Products.Index">Producten</a>
+        </li>
+        <li>
+            <a href="@AppRoutes.Articles.Index">Artikelen</a>
+        </li>
+        <li>
+            <a href="@AppRoutes.Orders.Index">Bestellingen</a>
+        </li>
+        <li>
+            <a href="@AppRoutes.Customers.Index">Klanten</a>
+        </li>
+        <li>
+            <button class="logout-button" @onclick="Logout">Uitloggen</button>
+        </li>
+    </ul>
+</nav>
 
 @code {
-    private bool collapseNavMenu = true;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private IBearerTokenStore TokenStore { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
+    private void Logout()
     {
-        collapseNavMenu = !collapseNavMenu;
+        TokenStore.SetToken(string.Empty);
+        ((TokenAuthenticationStateProvider)AuthenticationStateProvider).AuthenticateUser();
+        NavigationManager.NavigateTo(AppRoutes.Account.SignIn);
     }
 }

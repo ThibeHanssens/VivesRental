@@ -1,0 +1,55 @@
+﻿@page "/articles"
+@using VivesRental.BlazorApp.Services
+@inject IJSRuntime JSRuntime
+@inject ArticleService ArticleService
+@inject NavigationManager NavigationManager
+
+<h1>Artikelen Overzicht</h1>
+
+<button class="btn-primary" @onclick="NavigateToCreate">Nieuw Artikel</button>
+
+<table>
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Status</th>
+            <th>Acties</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var article in Articles)
+        {
+            <tr>
+                <td>@article.ProductName</td>
+                <td>@article.Status</td>
+                <td>
+                    <button class="btn-danger" @onclick="() => DeleteArticle(article.Id)">Verwijderen</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private IList<ArticleResult> Articles = new List<ArticleResult>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Articles = await ArticleService.GetAllAsync();
+    }
+
+    private void NavigateToCreate()
+    {
+        NavigationManager.NavigateTo("/articles/create");
+    }
+
+    private async Task DeleteArticle(Guid id)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Weet je zeker dat je dit artikel wilt verwijderen?");
+        if (confirmed)
+        {
+            await ArticleService.DeleteAsync(id);
+            Articles = await ArticleService.GetAllAsync();
+        }
+    }
+}

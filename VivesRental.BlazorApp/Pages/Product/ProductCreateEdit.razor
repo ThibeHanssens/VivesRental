@@ -1,0 +1,69 @@
+﻿@page "/products/create"
+@page "/products/edit/{ProductId:guid}"
+@using VivesRental.Services.Model.Requests
+@inject ProductService ProductService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<h1>@(IsEdit ? "Product Bewerken" : "Nieuw Product Aanmaken")</h1>
+
+<EditForm Model="@Product" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Naam:</label>
+        <InputText @bind-Value="Product.Name" />
+    </div>
+
+    <div>
+        <label>Beschrijving:</label>
+        <InputText @bind-Value="Product.Description" />
+    </div>
+
+    <div>
+        <label>Fabrikant:</label>
+        <InputText @bind-Value="Product.Manufacturer" />
+    </div>
+
+    <div>
+        <label>Afbeelding URL:</label>
+        <InputText @bind-Value="Product.ImageUrl" />
+    </div>
+
+    <button type="submit" class="btn-primary">@("Opslaan")</button>
+</EditForm>
+
+@code {
+    private ProductRequest Product = new();
+    private bool IsEdit => ProductId != null;
+    [Parameter] public Guid? ProductId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (IsEdit)
+        {
+            var product = await ProductService.GetByIdAsync(ProductId.Value);
+            if (product != null)
+            {
+                Product.Name = product.Name;
+                Product.Description = product.Description;
+                Product.Manufacturer = product.Manufacturer;
+                Product.ImageUrl = product.ImageUrl;
+            }
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (IsEdit)
+        {
+            await ProductService.EditAsync(ProductId.Value, Product);
+        }
+        else
+        {
+            await ProductService.CreateAsync(Product);
+        }
+        NavigationManager.NavigateTo("/products");
+    }
+}

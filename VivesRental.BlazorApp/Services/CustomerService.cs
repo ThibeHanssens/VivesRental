@@ -1,24 +1,42 @@
-﻿using System.Net.Http.Json; // Nodig voor het gebruik van GetFromJsonAsync.
-using VivesRental.Services.Model.Results; // Importeert het model voor de resultaten.
+﻿using VivesRental.Sdk;
+using VivesRental.Services.Model.Filters;
+using VivesRental.Services.Model.Requests;
+using VivesRental.Services.Model.Results;
 
-namespace VivesRental.BlazorApp.Services
+namespace VivesRental.BlazorApp.Services;
+
+// **Service for Customers**
+public class CustomerService
 {
-    // Deze service beheert alle API-aanroepen die betrekking hebben op Customers.
-    public class CustomerService
+    private readonly CustomerSdk _sdk;
+
+    // **Constructor**: Initializes the SDK dependency
+    public CustomerService(CustomerSdk sdk)
     {
-        private readonly HttpClient _httpClient;
-        // De HttpClient wordt gebruikt om communicatie met de API te faciliteren.
+        _sdk = sdk;
+    }
 
-        public CustomerService(HttpClient httpClient)
-        {
-            _httpClient = httpClient; // Dependency Injection van HttpClient.
-        }
+    // **Get All Customers**: Retrieves a list of customers with optional filters
+    public async Task<IList<CustomerResult>> GetAllAsync(CustomerFilter? filter = null)
+    {
+        return await _sdk.Find(filter);
+    }
 
-        public async Task<List<CustomerResult>> GetAllAsync()
-        {
-            // Methode om alle klanten op te halen via een GET-aanroep naar de API.
-            return await _httpClient.GetFromJsonAsync<List<CustomerResult>>("customers");
-            // De API-call haalt een JSON-array op en deserialiseert deze naar een lijst van CustomerResult-objecten.
-        }
+    // **Get Customer by ID**: Fetches a specific customer by ID
+    public async Task<CustomerResult?> GetByIdAsync(Guid id)
+    {
+        return await _sdk.Get(id);
+    }
+
+    // **Create Customer**: Adds a new customer
+    public async Task<CustomerResult?> CreateAsync(CustomerRequest request)
+    {
+        return await _sdk.Create(request);
+    }
+
+    // **Delete Customer**: Removes a customer by ID
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        return await _sdk.Remove(id);
     }
 }
