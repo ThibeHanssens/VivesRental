@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VivesRental.Services;
 using VivesRental.Services.Model.Results;
 
@@ -8,6 +9,7 @@ namespace VivesRental.Api.Controllers;
 // Beheert alle API-endpoints die gerelateerd zijn aan Orders.
 [ApiController]
 [Route("api/[controller]")]
+[Authorize] // Beveilig de hele controller.
 public class OrdersController : ControllerBase
 {
     private readonly OrderService _orderService;

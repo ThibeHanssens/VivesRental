@@ -12,8 +12,8 @@ using VivesRental.Repository.Core;
 namespace VivesRental.Repository.Migrations
 {
     [DbContext(typeof(VivesRentalDbContext))]
-    [Migration("20250112074358_AddProductImageUrl")]
-    partial class AddProductImageUrl
+    [Migration("20250112163351_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -198,6 +198,38 @@ namespace VivesRental.Repository.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Product");
+                });
+
+            modelBuilder.Entity("VivesRental.Model.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("User");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c2f94ba9-f211-48d8-88dc-da74573c1975"),
+                            Password = "$2a$11$KnBj7OcciIzB9uZ1N6OdhubwW5IK53JoWaYMkeRdn3uiHftsGtFNW",
+                            Role = "Admin",
+                            Username = "medewerker"
+                        });
                 });
 
             modelBuilder.Entity("VivesRental.Model.Article", b =>

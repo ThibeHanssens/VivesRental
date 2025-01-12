@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VivesRental.Services;
 using VivesRental.Services.Model.Filters;
 using VivesRental.Services.Model.Results;
@@ -9,6 +10,7 @@ namespace VivesRental.Api.Controllers;
 // Beheert alle API-endpoints gerelateerd aan `OrderLines`.
 [ApiController]
 [Route("api/[controller]")]
+[Authorize] // Beveilig de hele controller.
 public class OrderLinesController : ControllerBase
 {
     private readonly OrderLineService _orderLineService;

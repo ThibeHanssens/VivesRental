@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VivesRental.Services;
 using VivesRental.Services.Model.Filters;
 using VivesRental.Services.Model.Requests;
@@ -10,6 +11,7 @@ namespace VivesRental.Api.Controllers;
 // Beheert alle API-endpoints gerelateerd aan `ArticleReservations`.
 [ApiController]
 [Route("api/[controller]")]
+[Authorize] // Beveilig de hele controller.
 public class ArticleReservationsController : ControllerBase
 {
     private readonly ArticleReservationService _articleReservationService;

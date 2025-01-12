@@ -2,6 +2,7 @@
 using VivesRental.Services;
 using VivesRental.Services.Model.Results;
 using VivesRental.Services.Model.Requests;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VivesRental.Api.Controllers;
 
@@ -9,6 +10,7 @@ namespace VivesRental.Api.Controllers;
 // Beheert alle API-endpoints die gerelateerd zijn aan Klanten.
 [ApiController]
 [Route("api/[controller]")]
+[Authorize] // Beveilig de hele controller.
 public class CustomersController : ControllerBase
 {
     private readonly CustomerService _customerService;

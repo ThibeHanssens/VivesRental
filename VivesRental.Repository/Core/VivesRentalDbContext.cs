@@ -7,7 +7,6 @@ namespace VivesRental.Repository.Core;
 // Deze klasse beheert de interactie met de database via Entity Framework Core.
 public class VivesRentalDbContext : DbContext
 {
-    // Constructor waarbij opties voor DbContext worden doorgegeven, zoals de connection string.
     public VivesRentalDbContext(DbContextOptions<VivesRentalDbContext> options) : base(options)
     {
     }
@@ -26,6 +25,7 @@ public class VivesRentalDbContext : DbContext
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderLine> OrderLines => Set<OrderLine>();
     public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<User> Users => Set<User>();
 
     // Configuratie van de models tijdens het aanmaken van de database.
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -33,5 +33,14 @@ public class VivesRentalDbContext : DbContext
         // Verwijdert de standaard meervoudige naamgeving van tabellen.
         modelBuilder.RemovePluralizingTableNameConvention();
         base.OnModelCreating(modelBuilder);
+
+        // **Seed een standaardgebruiker**:
+        modelBuilder.Entity<User>().HasData(new User
+        {
+            Id = Guid.NewGuid(),
+            Username = "medewerker",
+            Password = BCrypt.Net.BCrypt.HashPassword("1234"), // Gebruik BCrypt voor hashing
+            Role = "Admin"
+        });
     }
 }

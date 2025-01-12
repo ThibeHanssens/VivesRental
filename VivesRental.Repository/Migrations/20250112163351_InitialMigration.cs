@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VivesRental.Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,11 +35,26 @@ namespace VivesRental.Repository.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Manufacturer = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Publisher = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RentalExpiresAfterDays = table.Column<int>(type: "int", nullable: false)
+                    RentalExpiresAfterDays = table.Column<int>(type: "int", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Product", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "User",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -139,6 +154,11 @@ namespace VivesRental.Repository.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "User",
+                columns: new[] { "Id", "Password", "Role", "Username" },
+                values: new object[] { new Guid("c2f94ba9-f211-48d8-88dc-da74573c1975"), "$2a$11$KnBj7OcciIzB9uZ1N6OdhubwW5IK53JoWaYMkeRdn3uiHftsGtFNW", "Admin", "medewerker" });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Article_ProductId",
                 table: "Article",
@@ -178,6 +198,9 @@ namespace VivesRental.Repository.Migrations
 
             migrationBuilder.DropTable(
                 name: "OrderLine");
+
+            migrationBuilder.DropTable(
+                name: "User");
 
             migrationBuilder.DropTable(
                 name: "Article");
