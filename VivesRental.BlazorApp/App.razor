@@ -1,8 +1,5 @@
-﻿// **App.razor**
-// Dit bestand beheert de routing en autorisatie van de applicatie en zorgt voor een consistente gebruikerservaring.
-
-@using Microsoft.AspNetCore.Components.Authorization // Ondersteunt autorisatie via claims en authenticatiestatus.
-@using VivesRental.BlazorApp // Toegang tot applicatiespecifieke routes en componenten.
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using VivesRental.BlazorApp
 @inject NavigationManager NavigationManager // Injecteert NavigationManager voor navigatiefuncties.
 
 <Router AppAssembly="@typeof(App).Assembly">

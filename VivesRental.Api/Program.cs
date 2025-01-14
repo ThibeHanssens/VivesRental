@@ -22,7 +22,7 @@ builder.Services.AddCors(options =>
     {
         builder.AllowAnyHeader() // Alle headers toestaan (zoals Authorization).
             .AllowAnyMethod() // Alle HTTP-methoden toestaan (GET, POST, DELETE, enz.).
-            .WithOrigins("https://localhost:5001") // URL van de Blazor WebAssembly-client (pas aan indien nodig).
+            .WithOrigins("https://localhost:7164") // URL van de Blazor WebAssembly-client (pas aan indien nodig).
             .AllowCredentials(); // Sta cookies en andere credenties toe.
     });
 });

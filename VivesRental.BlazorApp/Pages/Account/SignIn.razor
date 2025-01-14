@@ -1,12 +1,13 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Vives.Presentation.Authentication
 @using VivesRental.BlazorApp.Security
-@attribute [Route(AppRoutes.Account.SignIn)] // **Route Attribuut**: Verbindt deze pagina met de route `/account/sign-in`.
+@using VivesRental.Sdk // Voor toegang tot AuthSdk
+@attribute [Route(AppRoutes.Account.SignIn)] // Verbindt deze pagina met de route `/account/sign-in`.
 
-@inject NavigationManager NavigationManager // **NavigationManager**: Voor navigatie tussen routes.
-@inject AuthenticationStateProvider AuthenticationStateProvider // **AuthenticationStateProvider**: Beheert de authenticatiestatus van gebruikers.
-@inject IBearerTokenStore TokenStore // **IBearerTokenStore**: Voor het opslaan van JWT-tokens.
-@inject HttpClient HttpClient // **HttpClient**: Voor communicatie met de backend.
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IBearerTokenStore TokenStore
+@inject AuthSdk AuthSdk // Injecteer AuthSdk voor authenticatie.
 
 <!-- Container voor inloggen -->
 <div class="signin-container">
@@ -42,39 +43,30 @@
 
         try
         {
-            // Verstuur een inlogverzoek naar de backend API.
-            var response = await HttpClient.PostAsJsonAsync("api/authenticate", new { Username = Email, Password });
-            if (!response.IsSuccessStatusCode)
+            // **Gebruik AuthSdk voor authenticatie**:
+            var token = await AuthSdk.AuthenticateAsync(Email, Password);
+
+            // Controleer of de token leeg is (mislukte login).
+            if (string.IsNullOrWhiteSpace(token))
             {
                 ErrorMessage = "Ongeldige inloggegevens.";
                 return;
             }
 
-            var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
-            if (tokenResponse?.Token is null)
-            {
-                ErrorMessage = "Authenticatie mislukt.";
-                return;
-            }
+            // **Token opslaan**:
+            TokenStore.SetToken(token);
 
-            // Sla het token op in de `TokenStore`.
-            TokenStore.SetToken(tokenResponse.Token);
-
-            // Werk de authenticatiestatus bij.
+            // **Authenticatiestatus bijwerken**:
             ((TokenAuthenticationStateProvider)AuthenticationStateProvider).AuthenticateUser();
 
-            // Navigeer naar de startpagina.
-            NavigationManager.NavigateTo(AppRoutes.Home.Index);
+            // **Navigatie naar Dashboard**:
+            NavigationManager.NavigateTo(AppRoutes.Dashboard.Index);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            // Toon een generieke foutmelding als er iets misgaat.
             ErrorMessage = "Er is een fout opgetreden tijdens het inloggen.";
+            Console.Error.WriteLine(ex);
         }
-    }
-
-    // Klasse om token te deserialiseren vanuit de API-respons.
-    private class TokenResponse
-    {
-        public string Token { get; set; } = string.Empty;
     }
 }
