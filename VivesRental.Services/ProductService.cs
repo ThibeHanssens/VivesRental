@@ -43,10 +43,10 @@ public class ProductService : IProductService
     // **Voegt een nieuw product toe**:
     public async Task<ProductResult?> Create(ProductRequest entity)
     {
-        // Controleert of de URL geldig is. Als de URL ongeldig is, wordt een standaard URL ingesteld.
+        // Controleert of de URL geldig is. Als de URL ongeldig is, wordt een dynamische URL gegenereerd.
         if (!IsValidUrl(entity.ImageUrl))
         {
-            entity.ImageUrl = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fnl.wikipedia.org%2Fwiki%2FHogeschool_VIVES&psig=AOvVaw2p0j1SFap9Ok9Ynu1ZbgP0&ust=1736754822854000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMj0iYXa74oDFQAAAAAdAAAAABAE";
+            entity.ImageUrl = GenerateImageUrl(entity.Name);
         }
 
         var product = new Product
@@ -74,10 +74,10 @@ public class ProductService : IProductService
             return null; // Retourneert null als het product niet bestaat.
         }
 
-        // Controleert of de URL geldig is. Als de URL ongeldig is, wordt een standaard URL ingesteld.
+        // Controleert of de URL geldig is. Als de URL ongeldig is, wordt een dynamische URL gegenereerd.
         if (!IsValidUrl(entity.ImageUrl))
         {
-            entity.ImageUrl = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fnl.wikipedia.org%2Fwiki%2FHogeschool_VIVES&psig=AOvVaw2p0j1SFap9Ok9Ynu1ZbgP0&ust=1736754822854000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMj0iYXa74oDFQAAAAAdAAAAABAE";
+            entity.ImageUrl = GenerateImageUrl(entity.Name);
         }
 
         // Update de eigenschappen van het product.
@@ -90,17 +90,6 @@ public class ProductService : IProductService
 
         await _context.SaveChangesAsync();
         return await Get(product.Id);
-    }
-
-    // **Valideert een URL**:
-    private bool IsValidUrl(string? url)
-    {
-        if (string.IsNullOrWhiteSpace(url))
-        {
-            return false;
-        }
-
-        return Uri.TryCreate(url, UriKind.Absolute, out _);
     }
 
     /// <summary>
@@ -191,5 +180,22 @@ public class ProductService : IProductService
         var articleIdParameter = new SqlParameter("@ProductId", productId);
 
         await _context.Database.ExecuteSqlRawAsync(commandText, articleIdParameter);
+    }
+
+    // Helperfunctie om een afbeelding-URL te genereren.
+    private string GenerateImageUrl(string productName)
+    {
+        return $"https://dummyimage.com/300x300/000/fff&text={Uri.EscapeDataString(productName)}";
+    }
+
+    // Helperfunctie om een URL te valideren.
+    private bool IsValidUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return false;
+        }
+
+        return Uri.TryCreate(url, UriKind.Absolute, out _);
     }
 }
