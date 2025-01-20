@@ -1,24 +1,27 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
-@using VivesRental.BlazorApp
+﻿@using Microsoft.AspNetCore.Components.Authorization // Voor toegang tot authenticatiestatus.
+@using VivesRental.BlazorApp // Voor applicatieroutes en configuratie.
 @inject NavigationManager NavigationManager // Injecteert NavigationManager voor navigatiefuncties.
 
+<!-- Router: Beheert de navigatie en controleert of routes geldig zijn. -->
 <Router AppAssembly="@typeof(App).Assembly">
-    <!-- Als een route wordt gevonden, voer deze uit: -->
+    <!-- Als een geldige route wordt gevonden: -->
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
             <!-- Controleer of de gebruiker geautoriseerd is: -->
             <NotAuthorized>
-                @* Redirect naar de inlogpagina als de gebruiker niet geautoriseerd is *@
+                @* Gebruiker is niet geautoriseerd, stuur door naar de inlogpagina *@
                 @{
-                    var signInRoute = AppRoutes.Account.SignIn;
+                    var signInRoute = AppRoutes.Account.SignIn; // Inlogroute
                     var uri = NavigationManager.Uri; // Huidige URL van de gebruiker.
                     var baseUri = NavigationManager.BaseUri; // Basis-URL van de applicatie.
                     var relativeUrl = uri.Substring(baseUri.Length - 1, uri.Length - baseUri.Length + 1);
+
+                    Console.WriteLine($"Niet-geautoriseerd: Navigeren naar {signInRoute} met returnUrl={relativeUrl}");
                     NavigationManager.NavigateTo($"{signInRoute}?returnUrl={relativeUrl}");
                 }
             </NotAuthorized>
         </AuthorizeRouteView>
-        <!-- Focus bij het navigeren naar een nieuwe pagina -->
+        <!-- Focus op de eerste `<h1>`-tag na navigatie -->
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
 

@@ -24,7 +24,7 @@ namespace VivesRental.Sdk
         public async Task<string?> AuthenticateAsync(string username, string password)
         {
             // Maak een loginverzoek met de opgegeven gebruikersnaam en wachtwoord.
-            var response = await _httpClient.PostAsJsonAsync("api/authenticate", new
+            var response = await _httpClient.PostAsJsonAsync("api/auth/authenticate", new
             {
                 Username = username,
                 Password = password
